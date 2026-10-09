@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-04T00:00:00+07:00",
+  "title": "Design System: Smart Farm",
+  "extensions": {
+    "colorMeta": {
+      "field-paper": { "role": "neutral", "displayName": "Field Paper", "canonical": "#f3f0e7", "tonalRamp": ["oklch(15% 0.015 91)", "oklch(27% 0.015 91)", "oklch(39% 0.015 91)", "oklch(51% 0.015 91)", "oklch(63% 0.015 91)", "oklch(75% 0.015 91)", "oklch(87% 0.015 91)", "oklch(95% 0.015 91)"] },
+      "botanical-ink": { "role": "neutral", "displayName": "Botanical Ink", "canonical": "#193329", "tonalRamp": ["oklch(15% 0.04 155)", "oklch(27% 0.04 155)", "oklch(39% 0.04 155)", "oklch(51% 0.04 155)", "oklch(63% 0.04 155)", "oklch(75% 0.04 155)", "oklch(87% 0.04 155)", "oklch(95% 0.04 155)"] },
+      "observation-muted": { "role": "neutral", "displayName": "Observation Muted", "canonical": "#667069", "tonalRamp": ["oklch(15% 0.015 150)", "oklch(27% 0.015 150)", "oklch(39% 0.015 150)", "oklch(51% 0.015 150)", "oklch(63% 0.015 150)", "oklch(75% 0.015 150)", "oklch(87% 0.015 150)", "oklch(95% 0.015 150)"] },
+      "rule-line": { "role": "neutral", "displayName": "Rule Line", "canonical": "#d7d4c8", "tonalRamp": ["oklch(15% 0.012 91)", "oklch(27% 0.012 91)", "oklch(39% 0.012 91)", "oklch(51% 0.012 91)", "oklch(63% 0.012 91)", "oklch(75% 0.012 91)", "oklch(87% 0.012 91)", "oklch(95% 0.012 91)"] },
+      "safe-green": { "role": "primary", "displayName": "Safe Green", "canonical": "#17755a", "tonalRamp": ["oklch(15% 0.09 165)", "oklch(27% 0.09 165)", "oklch(39% 0.09 165)", "oklch(51% 0.09 165)", "oklch(63% 0.09 165)", "oklch(75% 0.09 165)", "oklch(87% 0.09 165)", "oklch(95% 0.09 165)"] },
+      "deep-green": { "role": "primary", "displayName": "Deep Green", "canonical": "#0c4e3a", "tonalRamp": ["oklch(15% 0.075 165)", "oklch(27% 0.075 165)", "oklch(39% 0.075 165)", "oklch(51% 0.075 165)", "oklch(63% 0.075 165)", "oklch(75% 0.075 165)", "oklch(87% 0.075 165)", "oklch(95% 0.075 165)"] },
+      "soft-mint": { "role": "primary", "displayName": "Soft Mint", "canonical": "#d7e9df", "tonalRamp": ["oklch(15% 0.035 160)", "oklch(27% 0.035 160)", "oklch(39% 0.035 160)", "oklch(51% 0.035 160)", "oklch(63% 0.035 160)", "oklch(75% 0.035 160)", "oklch(87% 0.035 160)", "oklch(95% 0.035 160)"] },
+      "caution-orange": { "role": "secondary", "displayName": "Caution Orange", "canonical": "#d56a2d", "tonalRamp": ["oklch(15% 0.13 49)", "oklch(27% 0.13 49)", "oklch(39% 0.13 49)", "oklch(51% 0.13 49)", "oklch(63% 0.13 49)", "oklch(75% 0.13 49)", "oklch(87% 0.13 49)", "oklch(95% 0.13 49)"] },
+      "signal-amber": { "role": "secondary", "displayName": "Signal Amber", "canonical": "#e5b94a", "tonalRamp": ["oklch(15% 0.12 88)", "oklch(27% 0.12 88)", "oklch(39% 0.12 88)", "oklch(51% 0.12 88)", "oklch(63% 0.12 88)", "oklch(75% 0.12 88)", "oklch(87% 0.12 88)", "oklch(95% 0.12 88)"] },
+      "sheet-white": { "role": "neutral", "displayName": "Sheet White", "canonical": "#fffdf7", "tonalRamp": ["oklch(15% 0.008 91)", "oklch(27% 0.008 91)", "oklch(39% 0.008 91)", "oklch(51% 0.008 91)", "oklch(63% 0.008 91)", "oklch(75% 0.008 91)", "oklch(87% 0.008 91)", "oklch(95% 0.008 91)"] },
+      "danger-red": { "role": "tertiary", "displayName": "Danger Red", "canonical": "#a94739", "tonalRamp": ["oklch(15% 0.11 28)", "oklch(27% 0.11 28)", "oklch(39% 0.11 28)", "oklch(51% 0.11 28)", "oklch(63% 0.11 28)", "oklch(75% 0.11 28)", "oklch(87% 0.11 28)", "oklch(95% 0.11 28)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Field Journal Display", "purpose": "Plant names and primary page headings only." },
+      "title": { "displayName": "Section Title", "purpose": "Editorial section and profile headings." },
+      "body": { "displayName": "Thai Operational Body", "purpose": "Explanations, annotations, states, and supporting copy." },
+      "label": { "displayName": "Instrument Label", "purpose": "Buttons, eyebrows, tabs, and compact metadata." }
+    },
+    "shadows": [
+      { "name": "sheet-lift", "value": "0 8px 26px rgba(25,51,41,.06)", "purpose": "Profile and analytical sheets above the paper canvas." },
+      { "name": "chart-lift", "value": "0 7px 20px rgba(25,51,41,.06)", "purpose": "Compact chart surfaces." },
+      { "name": "toast-lift", "value": "0 8px 24px rgba(25,51,41,.2)", "purpose": "Temporary command confirmations." },
+      { "name": "navigation-lift", "value": "0 -10px 30px rgba(25,51,41,.12)", "purpose": "Separates bottom navigation from scrolling observations." }
+    ],
+    "motion": [
+      { "name": "view-enter", "value": "350ms cubic-bezier(.16,1,.3,1)", "purpose": "A restrained 8px fade-and-rise when switching views; disabled for reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "compact-phone", "value": "390px" },
+      { "name": "stacked-heading", "value": "520px" },
+      { "name": "mobile-operator", "value": "760px" }
+    ],
+    "components": [
+      {
+        "name": "Primary Action",
+        "kind": "button",
+        "refersTo": "button-primary",
+        "description": "Safe, affirmative action used for watering and reviewed configuration changes.",
+        "html": "<button class=\"ds-btn-primary\">รดน้ำ 5 วิ</button>",
+        "css": ".ds-btn-primary{border:1px solid var(--green);border-radius:10px;padding:13px;background:var(--green);color:white;font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:filter .18s ease,transform .18s ease}.ds-btn-primary:hover{filter:brightness(.94)}.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}.ds-btn-primary:disabled{opacity:.4;cursor:not-allowed}"
+      },
+      {
+        "name": "Outline Action",
+        "kind": "button",
+        "refersTo": "button-outline",
+        "description": "Compact secondary action on the paper field.",
+        "html": "<button class=\"ds-btn-outline\">เปิด</button>",
+        "css": ".ds-btn-outline{border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:8px;padding:8px 12px;font-family:'IBM Plex Sans Thai',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:background .18s ease}.ds-btn-outline:hover{background:var(--white)}.ds-btn-outline:active{background:var(--line)}.ds-btn-outline:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}"
+      },
+      {
+        "name": "Mode Selector",
+        "kind": "chip",
+        "refersTo": "mode-active",
+        "description": "Three-state operating mode control with one unmistakable active segment.",
+        "html": "<div class=\"ds-mode\" aria-label=\"โหมดการทำงาน\"><button class=\"ds-mode-active\">AUTO</button><button>MANUAL</button><button>SAFE</button></div>",
+        "css": ".ds-mode{display:flex;border:1px solid var(--ink);padding:3px;border-radius:10px;background:var(--white)}.ds-mode button{border:0;background:transparent;color:var(--ink);padding:8px 11px;border-radius:7px;font-family:'IBM Plex Sans Thai',sans-serif;font-size:11px;font-weight:700;cursor:pointer}.ds-mode button:hover{background:var(--paper)}.ds-mode .ds-mode-active{background:var(--ink);color:white}.ds-mode button:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}"
+      },
+      {
+        "name": "Profile Sheet",
+        "kind": "card",
+        "refersTo": "card-sheet",
+        "description": "Elevated paper sheet for a coherent plant profile or analytical instrument.",
+        "html": "<section class=\"ds-sheet\"><span>โปรไฟล์ที่ใช้งานอยู่</span><h3>ค่าดูแลประจำแปลง</h3><p>ค่าที่ตรวจสอบแล้วสำหรับการทำงานในแปลง</p></section>",
+        "css": ".ds-sheet{background:var(--white);color:var(--ink);border-radius:14px;padding:24px;box-shadow:0 8px 26px rgba(25,51,41,.06);font-family:'IBM Plex Sans Thai',sans-serif}.ds-sheet span{color:var(--green);font-size:11px;font-weight:700}.ds-sheet h3{font-family:Newsreader,serif;font-size:27px;line-height:1.05;margin:5px 0}.ds-sheet p{color:var(--muted);font-size:12px;line-height:1.35;margin:0}"
+      },
+      {
+        "name": "Bottom Navigation",
+        "kind": "nav",
+        "description": "Thai-first four-destination navigation tray for the LINE MINI App.",
+        "html": "<nav class=\"ds-nav\" aria-label=\"เมนูหลัก\"><button class=\"ds-nav-active\"><span>●</span>หน้าหลัก</button><button><span>○</span>ประวัติ</button><button><span>○</span>พืช</button><button><span>○</span>ตั้งค่า</button></nav>",
+        "css": ".ds-nav{display:grid;grid-template-columns:repeat(4,1fr);background:var(--ink);padding:7px;border-radius:17px 17px 0 0;box-shadow:0 -10px 30px rgba(25,51,41,.12)}.ds-nav button{border:0;background:transparent;color:#a7b6ae;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;border-radius:10px;font-family:'IBM Plex Sans Thai',sans-serif;font-size:10px;cursor:pointer}.ds-nav button:hover{color:white}.ds-nav .ds-nav-active{background:#2d4a3e;color:white}.ds-nav button:focus-visible{outline:3px solid var(--yellow);outline-offset:1px}"
+      },
+      {
+        "name": "Telemetry Gauge",
+        "kind": "custom",
+        "description": "Compact current-value track with explicit threshold marks; always paired with numbers and copy.",
+        "html": "<div class=\"ds-reading\"><strong>64</strong><span>%</span><div class=\"ds-gauge\"><i></i><b></b><b class=\"ds-target\"></b></div><small>รดน้ำต่ำกว่า 45% · เป้าหมาย 65%</small></div>",
+        "css": ".ds-reading{color:var(--ink);font-family:'IBM Plex Sans Thai',sans-serif}.ds-reading>strong{font-size:38px;line-height:1;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.04em}.ds-reading>span,.ds-reading small{color:var(--muted);font-size:11px}.ds-gauge{height:5px;background:#dad8ce;position:relative;margin:12px 0 7px;border-radius:3px}.ds-gauge i{display:block;width:64%;height:100%;background:var(--green);border-radius:3px}.ds-gauge b{position:absolute;left:45%;top:-3px;width:1px;height:11px;background:var(--ink)}.ds-gauge .ds-target{left:65%;top:-1px;height:7px}"
+      },
+      {
+        "name": "Event Ledger Row",
+        "kind": "custom",
+        "description": "A ruled observation entry connecting an actuator event, its cause, and its time.",
+        "html": "<div class=\"ds-event\"><span class=\"ds-event-icon\">●</span><div><strong>รดน้ำอัตโนมัติ</strong><span>ความชื้นต่ำกว่าค่าที่กำหนด</span></div><time>5 นาทีที่แล้ว</time></div>",
+        "css": ".ds-event{display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--ink);font-family:'IBM Plex Sans Thai',sans-serif}.ds-event-icon{width:34px;height:34px;display:grid;place-items:center;background:var(--mint);color:var(--green);border-radius:10px}.ds-event div{display:flex;flex-direction:column}.ds-event strong{font-size:12px}.ds-event div span,.ds-event time{font-size:10px;color:var(--muted)}"
+      }
+    ],
+    "narrative": {
+      "northStar": "The Greenhouse Field Logbook",
+      "overview": "Smart Farm should feel like a careful agronomist's observation book translated into a dependable mobile instrument. Warm paper, fine rules, editorial headings, compact annotations, and tabular measurements create a calm record of the greenhouse rather than a glossy consumer dashboard.\n\nThe interface is Thai-first and built for quick operation inside LINE. Important conditions must scan at a glance: green communicates safe or active states, amber marks attention and illumination, and red is reserved for genuine loss of connection or danger. Physical actions remain explicit, bounded, and visibly separate from passive readings.",
+      "keyCharacteristics": [
+        "Warm paper surfaces with botanical ink and fine divider rules.",
+        "Editorial serif headings paired with highly legible Thai sans-serif controls.",
+        "Dense but breathable telemetry arranged like measured field observations.",
+        "Green safe states, amber cautions, and text or icons accompanying every status color.",
+        "Mobile-first controls with large targets and an always-near navigation rail."
+      ],
+      "rules": [
+        { "name": "The Semantic Field Rule", "body": "Green means safe or active, amber means caution or illumination, and red means a real fault; never use these colors decoratively in ways that weaken their operational meaning.", "section": "colors" },
+        { "name": "The Red Rarity Rule", "body": "Danger red appears only when the operator needs to recognize a fault or blocked unsafe state.", "section": "colors" },
+        { "name": "The Two-Voice Rule", "body": "Newsreader speaks only for names and editorial hierarchy; IBM Plex Sans Thai carries every measurement, state, explanation, and action.", "section": "typography" },
+        { "name": "The Observation-First Rule", "body": "Arrange measurements by scan order and relationship, not by decorative card symmetry.", "section": "layout" },
+        { "name": "The Paper-Before-Shadow Rule", "body": "Establish hierarchy with paper tone, rules, and spacing before adding elevation.", "section": "elevation" },
+        { "name": "The Field-Tool Rule", "body": "Keep geometry compact and tactile; avoid oversized pills or ornamental blobs that make controls feel promotional.", "section": "shapes" }
+      ],
+      "dos": [
+        "Do preserve the Field Paper canvas and use rules to organize repeated observations.",
+        "Do pair every green, amber, or red state with Thai text and an icon or explicit label.",
+        "Do use tabular numerals for changing telemetry and keep units visually secondary.",
+        "Do make the cause, limit, duration, and result of every physical action visible.",
+        "Do respect reduced-motion preferences and retain the high-visibility amber keyboard focus ring."
+      ],
+      "donts": [
+        "Don't turn telemetry into a grid of heavy floating cards when a shared ruled field communicates the relationship better.",
+        "Don't use green as generic decoration, amber as celebration, or red for anything less than a fault or unsafe condition.",
+        "Don't let AI recommendations resemble direct actuator commands; reviewable guidance and physical control remain visually distinct.",
+        "Don't use Newsreader for dense Thai body copy, units, controls, or system states.",
+        "Don't hide operational meaning behind color alone or reduce primary mobile controls below a 44px touch target."
+      ]
+    }
+  }
+}

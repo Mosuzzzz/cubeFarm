@@ -1,0 +1,9 @@
+{
+  "name": "cube-farm",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix apps/mini-app run dev",
+    "build": "npm --prefix apps/mini-app run build",
+    "lint": "npm --prefix apps/mini-app run lint"
+  }
+}

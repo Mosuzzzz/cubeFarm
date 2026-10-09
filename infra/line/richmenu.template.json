@@ -1,0 +1,14 @@
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "smart-farm-owner-menu",
+  "chatBarText": "เมนูสวน",
+  "areas": [
+    { "bounds": { "x": 0, "y": 270, "width": 1250, "height": 920 }, "action": { "type": "uri", "label": "แดชบอร์ด", "uri": "__LIFF_URL__#overview" } },
+    { "bounds": { "x": 1250, "y": 270, "width": 1250, "height": 920 }, "action": { "type": "uri", "label": "ค้นหาพืช", "uri": "__LIFF_URL__#plant" } },
+    { "bounds": { "x": 0, "y": 1190, "width": 625, "height": 496 }, "action": { "type": "uri", "label": "สถานะพืช", "uri": "__LIFF_URL__#overview" } },
+    { "bounds": { "x": 625, "y": 1190, "width": 625, "height": 496 }, "action": { "type": "uri", "label": "ควบคุมอุปกรณ์", "uri": "__LIFF_URL__#watering" } },
+    { "bounds": { "x": 1250, "y": 1190, "width": 625, "height": 496 }, "action": { "type": "uri", "label": "ประวัติ", "uri": "__LIFF_URL__#history" } },
+    { "bounds": { "x": 1875, "y": 1190, "width": 625, "height": 496 }, "action": { "type": "uri", "label": "ตั้งค่า", "uri": "__LIFF_URL__#settings" } }
+  ]
+}

@@ -1,0 +1,9 @@
+.env
+.env.local
+node_modules/
+.next/
+dist/
+.DS_Store
+.impeccable/review/
+.kilo/
+firmware/esp32/include/secrets.h
