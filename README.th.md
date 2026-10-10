@@ -29,42 +29,42 @@
 
 ```mermaid
 flowchart TB
-    subgraph EdgeDevice["ฮาร์ดแวร์ปลายทาง (ESP32 Controller)"]
-        Sensors["เซนเซอร์ RS485 Modbus RTU\n- อุณหภูมิและความชื้นอากาศ (SHT31) ID:247\n- ความเข้มแสง (BH1750) ID:247\n- ความชื้นในดิน (Soil VWC) ID:1"]
-        Relays["โมดูลรีเลย์ I2C PCF8574A (0x38)\n- รีเลย์ 1: ไฟปลูกพืช (Grow Light)\n- รีเลย์ 2: ปั๊มน้ำรดน้ำ (Water Pump)"]
-        ESP32["ESP32 Firmware\n(ระบบควบคุมอัตโนมัติ + Watchdog ป้องกันค้าง)"]
+    subgraph EdgeDevice["ฮาร์ดแวร์ปลายทาง ESP32 Controller"]
+        Sensors["เซนเซอร์ RS485 Modbus RTU\n- อุณหภูมิและความชื้นอากาศ SHT31 ID 247\n- ความเข้มแสง BH1750 ID 247\n- ความชื้นในดิน Soil VWC ID 1"]
+        Relays["โมดูลรีเลย์ I2C PCF8574A 0x38\n- รีเลย์ 1: ไฟปลูกพืช Grow Light\n- รีเลย์ 2: ปั๊มน้ำรดน้ำ Water Pump"]
+        ESP32["ESP32 Firmware\nระบบควบคุมอัตโนมัติ + Watchdog ป้องกันค้าง"]
         Sensors -->|UART2 RS485| ESP32
         ESP32 -->|I2C Active-LOW| Relays
     end
 
-    subgraph MessagingBroker["ตัวกลางรับส่งข้อมูล (Local Network)"]
-        MQTT["Eclipse Mosquitto (MQTT:1883)\nหัวข้อ: telemetry, command, config, status"]
+    subgraph MessagingBroker["ตัวกลางรับส่งข้อมูล Local Network"]
+        MQTT["Eclipse Mosquitto MQTT 1883\nหัวข้อ: telemetry, command, config, status"]
     end
 
-    subgraph BackendServer["ระบบหลังบ้านและฐานข้อมูล (Backend Stack)"]
-        API["Go Gin API Server (:8080)\n- MQTT Bridge เชื่อมโยงอุปกรณ์\n- ตรวจสอบลายเซ็น LINE Webhook\n- ตรวจสอบสิทธิ์ผู้ใช้ด้วย LIFF Token\n- มอนิเตอร์สถานะอุปกรณ์และเซนเซอร์"]
-        DB[(PostgreSQL 18)\n- ประวัติข้อมูลเซนเซอร์\n- บันทึกการทำงานของรีเลย์\n- โปรไฟล์พืชและการตั้งค่า\n- ประวัติการแจ้งเตือน]
+    subgraph BackendServer["ระบบหลังบ้านและฐานข้อมูล Backend Stack"]
+        API["Go Gin API Server port 8080\n- MQTT Bridge เชื่อมโยงอุปกรณ์\n- ตรวจสอบลายเซ็น LINE Webhook\n- ตรวจสอบสิทธิ์ผู้ใช้ด้วย LIFF Token\n- มอนิเตอร์สถานะอุปกรณ์และเซนเซอร์"]
+        DB[("PostgreSQL 18\nประวัติข้อมูลเซนเซอร์\nบันทึกการทำงานของรีเลย์\nโปรไฟล์พืชและการตั้งค่า\nประวัติการแจ้งเตือน")]
         API <--> DB
     end
 
-    subgraph AI["ระบบประมวลผล AI"]
-        Groq["Groq LLM (Qwen / LLaMA)"]
+    subgraph AILayer["ระบบประมวลผล AI"]
+        Groq["Groq LLM\nQwen และ LLaMA"]
         Tavily["Tavily Web Search Grounding"]
         API <--> Groq
         API <--> Tavily
     end
 
-    subgraph ReverseProxy["เกตเวย์ความปลอดภัย (Ingress)"]
-        Nginx["Nginx Reverse Proxy (:8088)"]
-        Tunnel["Cloudflare Quick Tunnel\n(HTTPS สาธารณะ)"]
+    subgraph ReverseProxy["เกตเวย์ความปลอดภัย Ingress"]
+        Nginx["Nginx Reverse Proxy port 8088"]
+        Tunnel["Cloudflare Quick Tunnel\nHTTPS สาธารณะ"]
         Tunnel --> Nginx
         Nginx -->|/api/ และ /webhooks/| API
         Nginx -->|/| WebApp
     end
 
-    subgraph Client["ส่วนติดต่อผู้ใช้ (LINE Interface)"]
-        WebApp["Next.js 16 MINI App\n(แดชบอร์ดมือถือผ่าน LIFF)"]
-        LINE["LINE Official Account\n(Rich Menu + แจ้งเตือน + แชตบอต)"]
+    subgraph Client["ส่วนติดต่อผู้ใช้ LINE Interface"]
+        WebApp["Next.js 16 MINI App\nแดชบอร์ดมือถือผ่าน LIFF"]
+        LINE["LINE Official Account\nRich Menu แจ้งเตือน แชตบอต"]
         Owner["ผู้ใช้งาน / เจ้าของฟาร์ม"]
         Owner --> LINE
         Owner --> WebApp

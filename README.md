@@ -29,42 +29,42 @@ The system integrates seamlessly with **LINE** via a mobile-first **LINE MINI Ap
 ```mermaid
 flowchart TB
     subgraph EdgeDevice["ESP32 Edge Hardware (ET-SMART FARM V1)"]
-        Sensors["RS485 Modbus Sensors\n- SHT31 (Temp/Humidity) ID:247\n- BH1750 (Lux) ID:247\n- Soil VWC (Moisture) ID:1"]
-        Relays["I2C PCF8574A (0x38)\n- Relay 1: Grow Light\n- Relay 2: Water Pump"]
-        ESP32["ESP32 Controller\n(Local AUTO Logic + Safety Watchdog)"]
+        Sensors["RS485 Modbus Sensors\n- SHT31 Temp+Humidity ID 247\n- BH1750 Lux ID 247\n- Soil VWC Moisture ID 1"]
+        Relays["I2C PCF8574A at 0x38\n- Relay 1: Grow Light\n- Relay 2: Water Pump"]
+        ESP32["ESP32 Controller\nLocal AUTO Logic + Safety Watchdog"]
         Sensors -->|UART2 RS485| ESP32
         ESP32 -->|I2C Active-LOW| Relays
     end
 
-    subgraph MessagingBroker["Local Network / Cloud Broker"]
-        MQTT["Eclipse Mosquitto (MQTT:1883)\nTopics: telemetry, command, config, status"]
+    subgraph MessagingBroker["Local Network Broker"]
+        MQTT["Eclipse Mosquitto MQTT 1883\nTopics: telemetry, command, config, status"]
     end
 
-    subgraph BackendServer["Backend & Storage Stack"]
-        API["Go Gin API Server (:8080)\n- MQTT Bridge\n- LINE Webhook & Signature Auth\n- LIFF Auth & Guardrails\n- Device Monitoring Service"]
-        DB[(PostgreSQL 18)\n- Sensor Telemetry\n- Actuator Events\n- Plant Profiles\n- AI Recommendations\n- Alerts]
+    subgraph BackendServer["Backend and Storage Stack"]
+        API["Go Gin API Server port 8080\n- MQTT Bridge\n- LINE Webhook Signature Auth\n- LIFF Auth and Guardrails\n- Device Monitoring Service"]
+        DB[("PostgreSQL 18\nSensor Telemetry\nActuator Events\nPlant Profiles\nAI Recommendations\nAlerts")]
         API <--> DB
     end
 
-    subgraph AI["AI Grounding Layer"]
-        Groq["Groq LLM (Qwen/LLaMA)"]
+    subgraph AILayer["AI Grounding Layer"]
+        Groq["Groq LLM\nQwen / LLaMA"]
         Tavily["Tavily Web Search"]
         API <--> Groq
         API <--> Tavily
     end
 
-    subgraph ReverseProxy["Gateway & Ingress"]
-        Nginx["Nginx Reverse Proxy (:8088)"]
-        Tunnel["Cloudflare Quick Tunnel\n(Public HTTPS)"]
+    subgraph ReverseProxy["Gateway and Ingress"]
+        Nginx["Nginx Reverse Proxy port 8088"]
+        Tunnel["Cloudflare Quick Tunnel\nPublic HTTPS"]
         Tunnel --> Nginx
-        Nginx -->|/api/ & /webhooks/| API
+        Nginx -->|/api/ and /webhooks/| API
         Nginx -->|/| WebApp
     end
 
-    subgraph Client["LINE Client & User Interface"]
-        WebApp["Next.js 16 MINI App\n(LIFF Dashboard)"]
-        LINE["LINE Official Account\n(Rich Menu + Chatbot Webhook)"]
-        Owner["Farm Owner / User"]
+    subgraph Client["LINE Client and User Interface"]
+        WebApp["Next.js 16 MINI App\nLIFF Dashboard"]
+        LINE["LINE Official Account\nRich Menu and Chatbot Webhook"]
+        Owner["Farm Owner"]
         Owner --> LINE
         Owner --> WebApp
     end
@@ -72,7 +72,7 @@ flowchart TB
     ESP32 <-->|MQTT over Wi-Fi| MQTT
     MQTT <--> API
     LINE -->|Webhook Event| Tunnel
-    WebApp -->|REST API Requests| Nginx
+    WebApp -->|REST API| Nginx
 ```
 
 ---
