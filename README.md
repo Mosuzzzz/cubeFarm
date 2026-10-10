@@ -1,63 +1,290 @@
-# Smart Farm
+# CubeFarm / Smart Farm 🌱
 
-Smart Farm is a safety-first ESP32 farm controller with a LINE-ready mobile dashboard. The ESP32 keeps AUTO control local; the server stores history and relays authenticated commands over MQTT.
+[![Go Version](https://img.shields.io/badge/Go-1.24+-00ADD8?style=flat&logo=go)](https://golang.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=flat&logo=next.js)](https://nextjs.org)
+[![ESP32](https://img.shields.io/badge/Hardware-ESP32-E7352C?style=flat&logo=espressif)](https://espressif.com)
+[![Protocol](https://img.shields.io/badge/Protocol-MQTT%20%7C%20Modbus%20RTU-green?style=flat)](https://mqtt.org)
+[![LINE](https://img.shields.io/badge/LINE-MINI%20App%20(LIFF)-00C300?style=flat&logo=line)](https://line.me)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker)](https://www.docker.com)
 
-## Run the web demo
+> 🌐 **Language / ภาษา**: **English** | [🇹🇭 ภาษาไทย (README.th.md)](README.th.md)
+
+---
+
+### 1. Overview & Philosophy
+
+**CubeFarm (Smart Farm)** is an industrial-grade, safety-first IoT indoor agricultural automation system. Designed around the **ESP32 microcontroller**, it reads environmental telemetry through **Modbus RTU RS485 industrial sensors** and controls high-power loads (grow lights and irrigation pumps) via isolated I2C relays. 
+
+The system integrates seamlessly with **LINE** via a mobile-first **LINE MINI App (LIFF)** and **LINE Official Account (Bot & Rich Menu)**, while leveraging **Groq AI (LLMs) & Tavily search grounding** for plant profile recommendations.
+
+#### Core Principles
+- **Safety-First & Local-First Autonomy**: The ESP32 executes automation decisions (light cycle, moisture threshold, soak cooldown, maximum pump runtimes) completely locally. If the cloud, server, or Wi-Fi fails, the farm continues operating safely.
+- **Strict Separation of AI & Actuation**: AI models recommend optimal parameters based on live web research, but **never** directly trigger physical actuators. All AI suggestions require human owner review and validation before being synced to the hardware.
+- **Fail-Safe Hardware Design**: Active-low relay safety defaults, watchdog timers, hardware-level pump duration caps, and sensor staleness detection prevent flooding or crop damage under sensor fault conditions.
+
+---
+
+### 2. System Architecture
+
+```mermaid
+flowchart TB
+    subgraph EdgeDevice["ESP32 Edge Hardware (ET-SMART FARM V1)"]
+        Sensors["RS485 Modbus Sensors\n- SHT31 (Temp/Humidity) ID:247\n- BH1750 (Lux) ID:247\n- Soil VWC (Moisture) ID:1"]
+        Relays["I2C PCF8574A (0x38)\n- Relay 1: Grow Light\n- Relay 2: Water Pump"]
+        ESP32["ESP32 Controller\n(Local AUTO Logic + Safety Watchdog)"]
+        Sensors -->|UART2 RS485| ESP32
+        ESP32 -->|I2C Active-LOW| Relays
+    end
+
+    subgraph MessagingBroker["Local Network / Cloud Broker"]
+        MQTT["Eclipse Mosquitto (MQTT:1883)\nTopics: telemetry, command, config, status"]
+    end
+
+    subgraph BackendServer["Backend & Storage Stack"]
+        API["Go Gin API Server (:8080)\n- MQTT Bridge\n- LINE Webhook & Signature Auth\n- LIFF Auth & Guardrails\n- Device Monitoring Service"]
+        DB[(PostgreSQL 18)\n- Sensor Telemetry\n- Actuator Events\n- Plant Profiles\n- AI Recommendations\n- Alerts]
+        API <--> DB
+    end
+
+    subgraph AI["AI Grounding Layer"]
+        Groq["Groq LLM (Qwen/LLaMA)"]
+        Tavily["Tavily Web Search"]
+        API <--> Groq
+        API <--> Tavily
+    end
+
+    subgraph ReverseProxy["Gateway & Ingress"]
+        Nginx["Nginx Reverse Proxy (:8088)"]
+        Tunnel["Cloudflare Quick Tunnel\n(Public HTTPS)"]
+        Tunnel --> Nginx
+        Nginx -->|/api/ & /webhooks/| API
+        Nginx -->|/| WebApp
+    end
+
+    subgraph Client["LINE Client & User Interface"]
+        WebApp["Next.js 16 MINI App\n(LIFF Dashboard)"]
+        LINE["LINE Official Account\n(Rich Menu + Chatbot Webhook)"]
+        Owner["Farm Owner / User"]
+        Owner --> LINE
+        Owner --> WebApp
+    end
+
+    ESP32 <-->|MQTT over Wi-Fi| MQTT
+    MQTT <--> API
+    LINE -->|Webhook Event| Tunnel
+    WebApp -->|REST API Requests| Nginx
+```
+
+---
+
+### 3. Key Features
+
+- **Smart Environmental Monitoring**:
+  - Ambient temperature (°C) & relative humidity (%) via Sensirion SHT31.
+  - Light intensity (lux) via BH1750.
+  - Calibrated volumetric soil water content (VWC %) via Modbus soil probe.
+  - Real-time online/offline status with MQTT Last Will and Testament (LWT).
+- **Autonomous & Safe Hardware Control**:
+  - **AUTO Mode**: Hardware runs local PID/threshold logic. Turns grow lights on when lux is below threshold; irrigates when moisture is dry.
+  - **MANUAL Mode**: Remote controls enabled through LINE/Web UI with hardcoded pump duration caps.
+  - **SAFE Mode**: All actuators forced OFF if sensors report anomalies or stale readings (>15 seconds).
+- **LINE Integration**:
+  - **LINE MINI App (LIFF v2)**: Mobile-optimized dashboard with live telemetry meters, 24h interactive charts (Recharts), manual switches, plant settings, and event audit logs.
+  - **LINE Official Account**: Rich Menu for quick actions (`status`, `water`, `light`, `auto`), real-time push alerts, and an AI chat assistant grounded in live farm telemetry.
+- **AI Plant Research & Profiling**:
+  - Search any plant species (e.g., Cherry Tomato, Holy Basil, Japanese Melon).
+  - Grounded AI retrieval produces optimal Lux thresholds, Soil Moisture targets, and photoperiod guidelines.
+  - Owner reviews and fine-tunes settings before dispatching a signed config payload to the ESP32.
+
+---
+
+### 4. Hardware Specifications & Wiring
+
+| Component | Interface / Protocol | Pin / Address | Details |
+|---|---|---|---|
+| **Board** | ESP32 Dev Module | — | ET-SMART FARM V1 / ET ESP32 RS485 V3 |
+| **RS485 Bus** | HardwareSerial UART2 | RX: `GPIO 26`, TX: `GPIO 27`, DE/RE: `GPIO 25` | 9600 Baud, 8N1 |
+| **Weather Sensor** | Modbus RTU | Slave ID: `247` (`0xF7`) | SHT31 (Temp & Humidity) + BH1750 (Lux) |
+| **Soil Probe** | Modbus RTU | Slave ID: `1` (`0x01`) | Soil Volumetric Water Content (VWC) |
+| **Relay Controller** | I2C (`Wire`) | Address: `0x38` (PCF8574A) | Active-LOW trigger logic |
+| **Relay 1** | PCF8574A Output | Bit Mask: `0x01` | Grow Light AC/DC Actuator |
+| **Relay 2** | PCF8574A Output | Bit Mask: `0x04` | Water Pump Actuator (Timed) |
+
+---
+
+### 5. Project Directory Structure
+
+```text
+cubeFarm/
+├── apps/
+│   └── mini-app/             # Next.js 16 + React 19 + Tailwind CSS LINE MINI App
+│       ├── app/              # App router pages, layouts, and styles
+│       ├── lib/              # API clients, LIFF SDK integration, type definitions
+│       └── Dockerfile        # Container image for web dashboard
+├── services/
+│   └── api/                  # Go (Gin) API & MQTT Bridge
+│       ├── cmd/api/          # Main application entry point
+│       ├── internal/app/     # Business logic, MQTT handlers, LINE webhook, AI
+│       ├── migrations/       # PostgreSQL initialization scripts (001_init.sql)
+│       └── Dockerfile        # Multi-stage Go build container
+├── firmware/
+│   └── esp32/                # PlatformIO C++ firmware project
+│       ├── include/          # secrets.example.h, configuration headers
+│       ├── src/main.cpp      # ESP32 firmware source code
+│       └── platformio.ini    # Board and library dependencies
+├── infra/
+│   ├── cloudflare/           # Quick tunnel deployment script
+│   ├── line/                 # LINE Rich Menu templates and provisioning script
+│   ├── mosquitto/            # Mosquitto broker configuration
+│   ├── nginx/                # Nginx proxy configuration
+│   └── docker-compose.yml    # Complete stack compose file
+├── docs/                     # SRS, datasheets, architectural specs
+├── .env.example              # Environment variables template
+└── README.md                 # Project documentation
+```
+
+---
+
+### 6. Quick Start Guide
+
+#### Prerequisites
+- [Docker](https://www.docker.com/) & Docker Compose (v2.20+)
+- [Node.js](https://nodejs.org/) (v20+ recommended)
+- [Go](https://golang.org/) (v1.24+) *(Optional for local backend development)*
+- [PlatformIO](https://platformio.org/) *(Optional for firmware flashing)*
+
+#### Method A: Run Full Stack via Docker Compose (Recommended)
+
+1. **Clone the repository and prepare `.env`**:
+   ```bash
+   git clone https://github.com/Mosuzzzz/cubeFarm.git
+   cd cubeFarm
+   cp .env.example .env
+   ```
+
+2. **Configure your environment variables in `.env`**:
+   ```ini
+   POSTGRES_DB=smartfarm
+   POSTGRES_USER=smartfarm
+   POSTGRES_PASSWORD=your_secure_db_password
+   MQTT_BROKER_URL=tcp://mosquitto:1883
+   MQTT_USERNAME=smartfarm
+   MQTT_PASSWORD=your_secure_mqtt_password
+
+   # AI Credentials (Optional for plant search & AI bot)
+   GROQ_API_KEY=gsk_...
+   GROQ_MODEL=qwen/qwen3.8-27b
+   TAVILY_API_KEY=tvly-...
+
+   # LINE Credentials (Optional for LINE login & Webhook)
+   LIFF_ID=1234567890-abcdefgh
+   LINE_CHANNEL_SECRET=your_channel_secret
+   LINE_MESSAGING_CHANNEL_ACCESS_TOKEN=your_access_token
+   ```
+
+3. **Start all services**:
+   ```bash
+   docker compose --env-file .env -f infra/docker-compose.yml up --build -d
+   ```
+
+4. **Verify running containers**:
+   - Web & API Gateway: `http://localhost:8088`
+   - Healthcheck endpoint: `http://localhost:8088/healthz`
+   - MQTT Broker: `localhost:1883`
+
+---
+
+#### Method B: Run Web Dashboard Demo Independently
+
+The Next.js dashboard features an **automatic sample data fallback mode**. If the backend API or hardware is not currently online, the UI automatically transitions to demonstration mode with mock sensors and telemetry graphs:
 
 ```bash
 cd apps/mini-app
 npm install
 npm run dev
 ```
+Open `http://localhost:3000` in your mobile view or browser inspector.
 
-Open `http://localhost:3000`. If the API is unavailable, the dashboard explicitly switches to sample data so the interface remains demonstrable.
+---
 
-## Run the complete stack
+#### Method C: Flash ESP32 Firmware
 
-```bash
-cp .env.example .env
-docker compose --env-file .env -f infra/docker-compose.yml up --build
-```
+1. Open `firmware/esp32` in VS Code with PlatformIO extension or use CLI.
+2. Create `firmware/esp32/include/secrets.h` from `secrets.example.h`:
+   ```cpp
+   #pragma once
+   constexpr char WIFI_SSID[] = "YOUR_WIFI_SSID";
+   constexpr char WIFI_PASSWORD[] = "YOUR_WIFI_PASSWORD";
+   constexpr char MQTT_HOST[] = "192.168.1.100"; // LAN IP of your Mosquitto host
+   constexpr int  MQTT_PORT = 1883;
+   constexpr char MQTT_USER[] = "smartfarm";
+   constexpr char MQTT_PASS[] = "your_secure_mqtt_password";
+   ```
+3. Connect the ESP32 via USB and flash:
+   ```bash
+   pio run --target upload
+   pio device monitor --baud 115200
+   ```
 
-Open `http://localhost:8088`. Before production, change every default password, configure Mosquitto authentication/ACLs, provide LINE, Groq, and Tavily credentials, and put the Nginx endpoint behind HTTPS.
+---
 
-## Project layout
+### 7. LINE Bot & LIFF Setup
 
-- `apps/mini-app` — Next.js mobile-first dashboard
-- `services/api` — Go API, MQTT bridge, LINE signature verification
-- `services/api/migrations` — PostgreSQL schema
-- `firmware/esp32` — PlatformIO firmware with local safety logic
-- `infra` — Docker Compose, Nginx, Mosquitto
-- `docs` — project overview and SRS
+1. **Expose stack to Public HTTPS** (Required by LINE Platform):
+   Using Cloudflare Quick Tunnel (or your domain/ngrok):
+   ```bash
+   sh infra/cloudflare/quick-tunnel.sh
+   ```
+   *Copy the generated `https://xxxx.trycloudflare.com` address.*
 
-## Firmware
+2. **Configure LINE Developers Console**:
+   - **Messaging API Webhook URL**: `https://xxxx.trycloudflare.com/webhooks/line`
+   - **LIFF Endpoint URL**: `https://xxxx.trycloudflare.com/`
 
-Copy `firmware/esp32/include/secrets.example.h` to `secrets.h`, update Wi-Fi/MQTT values, then upload with PlatformIO. The firmware preserves the existing ET-SMART FARM V1 mapping: UART2 RS485 on GPIO 26/27 with direction GPIO 25, weather sensor Modbus ID 247, soil VWC sensor ID 1, and active-LOW relays through PCF8574A address `0x38`. The pump initializes OFF, every activation is time-limited, and invalid soil readings stop automatic watering.
+3. **Deploy Rich Menu**:
+   ```bash
+   export PUBLIC_BASE_URL=https://xxxx.trycloudflare.com
+   export RICH_MENU_IMAGE=infra/line/richmenu.jpg
+   set -a; . ./.env; set +a
+   sh infra/line/connect.sh
+   ```
 
-## Connect LINE
+---
 
-Set `LIFF_ID`, `LINE_CHANNEL_ID`, `LIFF_ALLOWED_USER_ID`, `LINE_CHANNEL_SECRET`, and `LINE_MESSAGING_CHANNEL_ACCESS_TOKEN` in `.env`. The legacy variable names are supported. `LINE_CHANNEL_SECRET` is still mandatory for webhook verification.
+### 8. MQTT Topics & API Reference
 
-Expose this stack on a public HTTPS URL and set the same URL as the LIFF endpoint. Then provision the webhook and default Rich Menu:
+#### MQTT Topic Conventions
 
-```bash
-export PUBLIC_BASE_URL=https://your-public-host.example
-export RICH_MENU_IMAGE=/absolute/path/to/richmenu.jpg
-set -a; . ./.env; set +a
-sh infra/line/connect.sh
-```
+| Topic | Publisher | Direction | Description |
+|---|---|---|---|
+| `smartfarm/{deviceId}/telemetry` | ESP32 | Publish | Telemetry JSON payload (Temp, Lux, Soil, Status) |
+| `smartfarm/{deviceId}/status` | ESP32 | Publish (LWT) | `online` or `offline` birth/will message |
+| `smartfarm/{deviceId}/command` | API | Subscribe | Actuator commands: `light`, `water`, `mode` |
+| `smartfarm/{deviceId}/config` | API | Subscribe | Target thresholds and plant configuration |
+| `smartfarm/{deviceId}/config/ack` | ESP32 | Publish | Configuration receipt acknowledgment |
 
-The API verifies raw webhook signatures, accepts webhook events from every LINE user, verifies LIFF ID tokens against LINE Login, and provides a Groq-powered LINE chatbot grounded in current farm telemetry. It also understands `status`, `auto`, `water`, and `light` commands. Remote actuator commands require MANUAL mode. Automatic device and sensor fault alerts use LINE broadcast and are delivered to every user who is a friend of the LINE Official Account.
+#### REST API Endpoints
 
-For a temporary development URL, run the stack and a Cloudflare Quick Tunnel in separate terminals:
+- `GET /healthz` — Service healthcheck.
+- `GET /api/v1/farms/:farmId/status` — Get live sensor readings & device status.
+- `GET /api/v1/farms/:farmId/history` — Get historical time-series sensor data.
+- `GET /api/v1/farms/:farmId/events` — Retrieve actuation and alert logs.
+- `POST /api/v1/farms/:farmId/mode` — Switch mode (`AUTO`, `MANUAL`, `SAFE`).
+- `POST /api/v1/farms/:farmId/light` — Toggle grow light state (`MANUAL` mode only).
+- `POST /api/v1/farms/:---
 
-```bash
-docker compose --env-file .env -f infra/docker-compose.yml up --build
-sh infra/cloudflare/quick-tunnel.sh
-```
+### 9. Safety & Failsafe Mechanisms
 
-Use the printed `https://...trycloudflare.com` address as `PUBLIC_BASE_URL` and as the LIFF endpoint URL. The address changes whenever the Quick Tunnel restarts, so it is suitable for testing only.
+1. **Hardware Pump Watchdog**: In the ESP32 firmware, every pump activation is bound to an auto-cutoff timer (default 5s, capped at 10s maximum). The relay is forcibly powered off at expiration to prevent water overflow.
+2. **Stale & Invalid Sensor Guard**: If soil moisture readings fail or are not updated within 15 seconds, automatic watering decisions are blocked immediately, and an alert is broadcast to the owner.
+3. **Dual-Layer Authentication & Verification**:
+   - `X-Line-Signature` is validated using raw HMAC-SHA256 for every LINE webhook callback.
+   - LIFF ID tokens are authenticated against LINE Login servers before granting REST API access.
+4. **Local Fallback Mode**: If the API or cloud backend is disconnected, the Next.js mini-app automatically displays sample data to keep the demonstration responsive and testable.
 
-## Current MVP boundary
+---
 
-The dashboard, safe control API, MQTT telemetry/commands, schema, LINE webhook signature check, infrastructure, firmware automation, and Groq + Tavily grounded plant search are implemented. Production LIFF token validation and LINE reply/rich-menu provisioning require project credentials and remain behind explicit configuration boundaries.
+### 10. License & Contributing
+
+Developed for educational and IoT indoor smart farming applications.  
+Issues and Pull Requests are welcome!
