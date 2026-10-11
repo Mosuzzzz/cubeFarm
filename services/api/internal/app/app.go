@@ -227,10 +227,14 @@ func (a *App) telemetry(_ mqtt.Client, msg mqtt.Message) {
 	if payload.ConfigVer != nil {
 		a.status.ConfigVersion = *payload.ConfigVer
 	}
+	wasOffline := !a.status.Online || a.offlineAlerted
 	a.status.Online = true
 	a.status.LastTelemetryAt = time.Now().UTC()
 	a.offlineAlerted = false
 	a.mu.Unlock()
+	if wasOffline {
+		go broadcastLine(fmt.Sprintf("✅ Smart Farm: ESP32 เปิดเครื่องแล้ว\nอุปกรณ์: %s\nเชื่อมต่อกับ MQTT สำเร็จ พร้อมทำงานแล้ว", payload.DeviceID))
+	}
 	for _, alert := range alerts {
 		go broadcastLine(alert)
 	}
